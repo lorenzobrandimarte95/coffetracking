@@ -5,7 +5,6 @@ export interface Person {
   coffeesOwed: number;
   color: string;
   email?: string;
-  department?: string;
 }
 
 export interface DBUser {
@@ -13,7 +12,6 @@ export interface DBUser {
   name: string;
   email: string;
   avatar_url: string;
-  department: string;
   created_at: string;
 }
 
@@ -30,6 +28,5 @@ export type AppView = 'home' | 'log' | 'profile';
 export interface UserFormData {
   name: string;
   email: string;
-  department: string;
   avatar_url: string;
 }
