@@ -1,7 +1,7 @@
 import React, { useState } from 'react'; // Added useState
 import { useAppContext } from '../context/AppContext';
 import Header from '../components/Header';
-import AddUserForm from '../../components/AddUserForm'; // Added AddUserForm import
+import AddUserForm from '../components/AddUserForm'; // Corrected import path
 import { User, Coffee, Clock, Info, ChevronRight } from 'lucide-react'; // ChevronRight might be unused after change
 
 const ProfilePage: React.FC = () => {
@@ -18,6 +18,10 @@ const ProfilePage: React.FC = () => {
   const topDebtor = [...people]
     .sort((a, b) => b.coffeesOwed - a.coffeesOwed)
     .filter(person => person.coffeesOwed > 0)[0];
+
+  const handleManagePeopleClick = () => {
+    setShowAddUserForm(true);
+  };
   
   return (
     <div className="pb-16 min-h-screen bg-gray-50">
@@ -82,7 +86,7 @@ const ProfilePage: React.FC = () => {
           <div className="divide-y divide-gray-100">
             <button
               className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
-              onClick={() => setShowAddUserForm(true)} // Changed onClick
+              onClick={handleManagePeopleClick} // Changed to use defined handler
             >
               <div className="flex items-center">
                 <Coffee size={20} className="text-gray-400" />
