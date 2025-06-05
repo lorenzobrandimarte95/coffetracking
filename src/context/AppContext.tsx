@@ -105,7 +105,6 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
         coffeesOwed: coffeesOwed,
         color: '#CCCCCC', // Default color
         email: user.email,
-        department: user.department,
       } as Person; // Type assertion if necessary for stricter type checking
     });
     setPeople(newPeople);
@@ -178,7 +177,6 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
         typeof potentialNewUser.name === 'string' && potentialNewUser.name.trim() !== '' &&
         typeof potentialNewUser.avatar_url === 'string' && // Allows empty string for avatar_url
         typeof potentialNewUser.email === 'string' && // Basic check, could be stricter regex
-        typeof potentialNewUser.department === 'string' && // Allows empty string
         typeof potentialNewUser.created_at === 'string' // Basic check, could be Date validation
       ) {
         const validatedNewUser: DBUser = {
@@ -186,7 +184,6 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
           name: potentialNewUser.name,
           email: potentialNewUser.email,
           avatar_url: potentialNewUser.avatar_url,
-          department: potentialNewUser.department,
           created_at: potentialNewUser.created_at,
         };
         setUsers(currentUsers => [...currentUsers, validatedNewUser]);
