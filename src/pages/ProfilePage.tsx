@@ -1,7 +1,7 @@
 import React, { useState } from 'react'; // Added useState
 import { useAppContext } from '../context/AppContext';
 import Header from '../components/Header';
-import AddUserForm from '../../components/AddUserForm'; // Added AddUserForm import
+import AddUserForm from '../components/AddUserForm'; // Corrected import path
 import { User, Coffee, Clock, Info, ChevronRight } from 'lucide-react'; // ChevronRight might be unused after change
 
 const ProfilePage: React.FC = () => {
