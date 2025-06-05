@@ -187,6 +187,26 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
           created_at: potentialNewUser.created_at,
         };
         setUsers(currentUsers => [...currentUsers, validatedNewUser]);
+
+        // --- Start of diagnostic code ---
+        const nextUsersStateForDiagnostics = [...users, validatedNewUser]; // Using 'users' from closure for this diagnostic
+
+        const diagnosticNewPeople = nextUsersStateForDiagnostics.map(usr => {
+          // Ensure coffeeRecords is an array, default to empty if not (though it should be)
+          const userCoffeeRecords = (coffeeRecords || []).filter(record => record.user_id === usr.id && !record.paid);
+          const coffeesOwed = userCoffeeRecords.length;
+          return {
+            id: usr.id,
+            name: usr.name,
+            avatar: usr.avatar_url,
+            coffeesOwed: coffeesOwed,
+            color: '#CCCCCC', // Default color
+            email: usr.email, // email is part of Person type
+          } as Person;
+        });
+        setPeople(diagnosticNewPeople);
+        console.log("AppContext: Diagnostic update to 'people' state performed in addUser.", diagnosticNewPeople);
+        // --- End of diagnostic code ---
       } else {
         console.warn(
           "Validation failed for new user data returned by Supabase. User not added to local state.",
