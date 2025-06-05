@@ -167,18 +167,45 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
       return;
     }
 
-    // Optimistically update the users list
+    // Stricter validation for the returned user data
     if (newInsertedUsers && newInsertedUsers.length > 0) {
-      // Assuming newInsertedUsers[0] is of type DBUser or compatible
-      setUsers(currentUsers => [...currentUsers, newInsertedUsers[0]]);
-    } else {
-      // This case should ideally not happen if insert was successful and .select() was used.
-      // If it does, it might mean RLS policies are preventing row return, or some other issue.
-      console.warn("User insert succeeded but no user data was returned by Supabase. Refetching might be needed or check RLS policies.");
-      // As a fallback, you could refetch all users here, but the goal is optimistic update.
-      // For now, just a warning. The UI might not update immediately if this happens.
+      const potentialNewUser = newInsertedUsers[0];
+
+      // Validate essential fields
+      if (
+        potentialNewUser &&
+        typeof potentialNewUser.id === 'string' && potentialNewUser.id.trim() !== '' &&
+        typeof potentialNewUser.name === 'string' && potentialNewUser.name.trim() !== '' &&
+        typeof potentialNewUser.avatar_url === 'string' && // Allows empty string for avatar_url
+        typeof potentialNewUser.email === 'string' && // Basic check, could be stricter regex
+        typeof potentialNewUser.department === 'string' && // Allows empty string
+        typeof potentialNewUser.created_at === 'string' // Basic check, could be Date validation
+      ) {
+        const validatedNewUser: DBUser = {
+          id: potentialNewUser.id,
+          name: potentialNewUser.name,
+          email: potentialNewUser.email,
+          avatar_url: potentialNewUser.avatar_url,
+          department: potentialNewUser.department,
+          created_at: potentialNewUser.created_at,
+        };
+        setUsers(currentUsers => [...currentUsers, validatedNewUser]);
+      } else {
+        console.warn(
+          "Validation failed for new user data returned by Supabase. User not added to local state.",
+          "Received data:", potentialNewUser
+        );
+        setError("Failed to process new user data from database. Please try refreshing.");
+      }
+    } else if (!error) { // No Supabase error from insert, but newInsertedUsers is null or empty
+      console.warn(
+        "User insert succeeded according to Supabase, but no user data was returned. Check RLS policies or .select() statement.",
+        "newInsertedUsers:", newInsertedUsers
+      );
+      // Optionally set an error for the user, or just log for developer awareness.
+      // setError("New user added, but couldn't immediately display. Please try refreshing."); // Example error for UI
     }
-    // The block for refetching all users has been removed.
+    // The 'error' variable from the insert operation is already handled before this block.
   };
 
   // Pay coffee
