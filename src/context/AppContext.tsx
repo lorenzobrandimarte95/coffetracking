@@ -1,10 +1,11 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { DBUser, CoffeeRecord, AppView } from '../types';
+import { DBUser, CoffeeRecord, AppView, Person } from '../types'; // Added Person
 import { supabase } from '../lib/supabase';
 
 interface AppContextType {
   users: DBUser[];
   coffeeRecords: CoffeeRecord[];
+  people: Person[]; // Added people
   currentView: AppView;
   selectedUserId: string | null;
   isLoading: boolean;
@@ -23,6 +24,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const [users, setUsers] = useState<DBUser[]>([]);
   const [coffeeRecords, setCoffeeRecords] = useState<CoffeeRecord[]>([]);
+  const [people, setPeople] = useState<Person[]>([]); // Added people state
   const [currentView, setCurrentView] = useState<AppView>('home');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,13 +33,20 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
   // Fetch users
   useEffect(() => {
     const fetchUsers = async () => {
+      if (!supabase) {
+        setError("Database client not available. Check Supabase configuration.");
+        setIsLoading(false);
+        return;
+      }
       setIsLoading(true);
-      const { data, error } = await supabase
+      setError(null);
+      const { data, error: fetchError } = await supabase
         .from('users')
         .select('*');
 
-      if (error) {
-        setError(error.message);
+      if (fetchError) {
+        setError(fetchError.message);
+        setUsers([]); // Clear users on error
       } else {
         setUsers(data || []);
       }
@@ -47,8 +56,67 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
     fetchUsers();
   }, []);
 
+  // Fetch all coffee records
+  useEffect(() => {
+    const fetchCoffeeRecords = async () => {
+      if (!supabase) {
+        // Error already set by fetchUsers or if supabase is globally missing
+        // setError("Database client not available. Check Supabase configuration.");
+        setIsLoading(false); // Ensure loading is false if supabase is not there
+        setCoffeeRecords([]); // Ensure records are empty
+        return;
+      }
+      setIsLoading(true);
+      // setError(null); // Don't nullify error if users fetch failed
+      const { data, error: fetchError } = await supabase
+        .from('coffee_records')
+        .select('*');
+
+      if (fetchError) {
+        setError(fetchError.message);
+        setCoffeeRecords([]); // Clear records on error
+      } else {
+        const transformedRecords = data
+          ? data.map(record => ({ ...record, date: new Date(record.date) }))
+          : [];
+        setCoffeeRecords(transformedRecords);
+      }
+      setIsLoading(false);
+    };
+
+    fetchCoffeeRecords();
+  }, []); // Runs on mount
+
+  // Transform users and coffeeRecords to people
+  useEffect(() => {
+    if (!users.length) { // If no users, no people to create or users fetch failed
+        setPeople([]);
+        return;
+    }
+
+    const newPeople = users.map(user => {
+      const userCoffeeRecords = coffeeRecords.filter(record => record.user_id === user.id && !record.paid);
+      const coffeesOwed = userCoffeeRecords.length;
+
+      return {
+        id: user.id,
+        name: user.name,
+        avatar: user.avatar_url, // Map avatar_url to avatar
+        coffeesOwed: coffeesOwed,
+        color: '#CCCCCC', // Default color
+        email: user.email,
+        department: user.department,
+      } as Person; // Type assertion if necessary for stricter type checking
+    });
+    setPeople(newPeople);
+  }, [users, coffeeRecords]); // Re-run when users or coffeeRecords change
+
   // Add a new coffee record
   const addCoffeeRecord = async (userId: string) => {
+    if (!supabase) {
+      setError("Database client not available. Cannot add record.");
+      return;
+    }
     const { error } = await supabase
       .from('coffee_records')
       .insert([{
@@ -62,19 +130,31 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
       return;
     }
 
-    // Refresh coffee records
-    const { data: records } = await supabase
-      .from('coffee_records')
-      .select('*')
-      .eq('user_id', userId);
+    // Refresh ALL coffee records to update counts correctly
+    // As per subtask, refetching all is acceptable for simplicity.
+    // A more optimal solution would be to add the new record to the existing state.
+    if (!error) { // Only refetch if insert was successful
+      setIsLoading(true); // Optional: indicate loading for refetch
+      const { data: allRecords, error: fetchError } = await supabase
+        .from('coffee_records')
+        .select('*');
 
-    if (records) {
-      setCoffeeRecords(records);
+      if (fetchError) {
+        setError(fetchError.message);
+      } else if (allRecords) {
+        const transformedRecords = allRecords.map(record => ({ ...record, date: new Date(record.date) }));
+        setCoffeeRecords(transformedRecords);
+      }
+      setIsLoading(false); // Optional: indicate end of loading for refetch
     }
   };
 
   // Add new user
   const addUser = async (userData: Omit<DBUser, 'id' | 'created_at'>) => {
+    if (!supabase) {
+      setError("Database client not available. Cannot add user.");
+      return;
+    }
     const { error } = await supabase
       .from('users')
       .insert([userData]);
@@ -85,17 +165,24 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
     }
 
     // Refresh users list
-    const { data: updatedUsers } = await supabase
+    // No need to setIsLoading here as the main user fetch does it.
+    const { data: updatedUsers, error: fetchError } = await supabase
       .from('users')
       .select('*');
 
-    if (updatedUsers) {
+    if (fetchError) {
+      setError(fetchError.message);
+    } else if (updatedUsers) {
       setUsers(updatedUsers);
     }
   };
 
   // Pay coffee
   const payCoffee = async (recordId: string) => {
+    if (!supabase) {
+      setError("Database client not available. Cannot pay coffee.");
+      return;
+    }
     const { error } = await supabase
       .from('coffee_records')
       .update({ paid: true })
@@ -117,6 +204,7 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
     <AppContext.Provider value={{
       users,
       coffeeRecords,
+      people, // Added people
       currentView,
       selectedUserId,
       isLoading,
