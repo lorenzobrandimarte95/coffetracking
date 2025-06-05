@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react'; // Added useState
 import { useAppContext } from '../context/AppContext';
 import Header from '../components/Header';
-import { User, Coffee, Clock, Info, ChevronRight } from 'lucide-react';
+import AddUserForm from '../../components/AddUserForm'; // Added AddUserForm import
+import { User, Coffee, Clock, Info, ChevronRight } from 'lucide-react'; // ChevronRight might be unused after change
 
 const ProfilePage: React.FC = () => {
-  const { people, coffeeRecords } = useAppContext();
+  const { people, coffeeRecords, addUser } = useAppContext(); // Added addUser
+  const [showAddUserForm, setShowAddUserForm] = useState(false); // Added state for form visibility
   
   // Calculate total coffees
   const totalCoffees = coffeeRecords.length;
@@ -78,12 +80,15 @@ const ProfilePage: React.FC = () => {
           <h3 className="text-lg font-semibold p-4 border-b border-gray-100">Settings</h3>
           
           <div className="divide-y divide-gray-100">
-            <button className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors">
+            <button
+              className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+              onClick={() => setShowAddUserForm(true)} // Changed onClick
+            >
               <div className="flex items-center">
                 <Coffee size={20} className="text-gray-400" />
                 <span className="ml-3">Manage People</span>
               </div>
-              <ChevronRight size={18} className="text-gray-400" />
+              {/* <ChevronRight size={18} className="text-gray-400" /> Removed ChevronRight */}
             </button>
             
             <button className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors">
@@ -103,6 +108,16 @@ const ProfilePage: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {showAddUserForm && (
+          <div className="mt-6 bg-white rounded-xl shadow-sm p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Person</h3>
+            <AddUserForm
+              performAddUser={addUser}
+              onFormClose={() => setShowAddUserForm(false)}
+            />
+          </div>
+        )}
       </main>
     </div>
   );

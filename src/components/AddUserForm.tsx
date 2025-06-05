@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { UserFormData } from '../types';
-import { supabase } from '../lib/supabase';
+
+// Define the function type for adding a user
+type addUserFunction = (userData: UserFormData) => Promise<void>;
 
 interface AddUserFormProps {
-  onSuccess: () => void;
-  onCancel: () => void;
+  performAddUser: addUserFunction;
+  onFormClose: () => void; // To be called on successful submission or cancellation
 }
 
-const AddUserForm: React.FC<AddUserFormProps> = ({ onSuccess, onCancel }) => {
+const AddUserForm: React.FC<AddUserFormProps> = ({ performAddUser, onFormClose }) => {
   const [formData, setFormData] = useState<UserFormData>({
     name: '',
     email: '',
@@ -17,25 +19,13 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onSuccess, onCancel }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     try {
-      const { error } = await supabase
-        .from('users')
-        .insert([
-          {
-            name: formData.name,
-            email: formData.email,
-            department: formData.department,
-            avatar_url: formData.avatar_url
-          }
-        ]);
-
-      if (error) throw error;
-      
-      onSuccess();
+      await performAddUser(formData);
+      onFormClose(); // Close form on successful submission
     } catch (error) {
       console.error('Error adding user:', error);
-      alert('Failed to add user');
+      // Display a more user-friendly error, or use a toast notification system
+      alert('Failed to add user. Please try again.');
     }
   };
 
@@ -88,7 +78,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({ onSuccess, onCancel }) => {
       <div className="flex justify-end space-x-3">
         <button
           type="button"
-          onClick={onCancel}
+          onClick={onFormClose} // Changed from onCancel to onFormClose
           className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
         >
           Cancel
