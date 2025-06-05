@@ -155,26 +155,30 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
       setError("Database client not available. Cannot add user.");
       return;
     }
-    const { error } = await supabase
+
+    // Chain .select() to get the inserted record back
+    const { data: newInsertedUsers, error } = await supabase
       .from('users')
-      .insert([userData]);
+      .insert([userData])
+      .select();
 
     if (error) {
       setError(error.message);
       return;
     }
 
-    // Refresh users list
-    // No need to setIsLoading here as the main user fetch does it.
-    const { data: updatedUsers, error: fetchError } = await supabase
-      .from('users')
-      .select('*');
-
-    if (fetchError) {
-      setError(fetchError.message);
-    } else if (updatedUsers) {
-      setUsers(updatedUsers);
+    // Optimistically update the users list
+    if (newInsertedUsers && newInsertedUsers.length > 0) {
+      // Assuming newInsertedUsers[0] is of type DBUser or compatible
+      setUsers(currentUsers => [...currentUsers, newInsertedUsers[0]]);
+    } else {
+      // This case should ideally not happen if insert was successful and .select() was used.
+      // If it does, it might mean RLS policies are preventing row return, or some other issue.
+      console.warn("User insert succeeded but no user data was returned by Supabase. Refetching might be needed or check RLS policies.");
+      // As a fallback, you could refetch all users here, but the goal is optimistic update.
+      // For now, just a warning. The UI might not update immediately if this happens.
     }
+    // The block for refetching all users has been removed.
   };
 
   // Pay coffee
