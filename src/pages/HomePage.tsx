@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import Header from '../components/Header';
 import PersonCard from '../components/PersonCard';
-import { Plus } from 'lucide-react';
+import { Plus, Coffee } from 'lucide-react';
 
 const HomePage: React.FC = () => {
   const { people, selectPerson, setCurrentView } = useAppContext();
