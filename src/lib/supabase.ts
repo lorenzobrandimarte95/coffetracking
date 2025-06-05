@@ -1,14 +1,26 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // These environment variables need to be set in your .env file
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
+export let supabase: SupabaseClient | null = null;
+export let supabaseInitializationError: string | null = null;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+  supabaseInitializationError = 'Missing Supabase environment variables: VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY must be defined in your .env file.';
+} else {
+  try {
+    supabase = createClient(supabaseUrl, supabaseAnonKey);
+  } catch (error) {
+    if (error instanceof Error) {
+      supabaseInitializationError = `Error initializing Supabase client: ${error.message}`;
+    } else {
+      supabaseInitializationError = 'An unknown error occurred during Supabase client initialization.';
+    }
+    supabase = null; // Ensure supabase is null if initialization fails
+  }
+}
 
 // Type definitions for your database tables
 export type User = {
