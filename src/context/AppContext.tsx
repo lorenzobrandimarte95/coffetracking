@@ -188,11 +188,9 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
         };
         setUsers(currentUsers => [...currentUsers, validatedNewUser]);
 
-        // --- Start of diagnostic code ---
-        const nextUsersStateForDiagnostics = [...users, validatedNewUser]; // Using 'users' from closure for this diagnostic
-
-        const diagnosticNewPeople = nextUsersStateForDiagnostics.map(usr => {
-          // Ensure coffeeRecords is an array, default to empty if not (though it should be)
+        // Update people state with the new user
+        const nextUsersState = [...users, validatedNewUser];
+        const newPeople = nextUsersState.map(usr => {
           const userCoffeeRecords = (coffeeRecords || []).filter(record => record.user_id === usr.id && !record.paid);
           const coffeesOwed = userCoffeeRecords.length;
           return {
@@ -201,12 +199,11 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
             avatar: usr.avatar_url,
             coffeesOwed: coffeesOwed,
             color: '#CCCCCC', // Default color
-            email: usr.email, // email is part of Person type
+            email: usr.email,
           } as Person;
         });
-        setPeople(diagnosticNewPeople);
-        console.log("AppContext: Diagnostic update to 'people' state performed in addUser.", diagnosticNewPeople);
-        // --- End of diagnostic code ---
+        setPeople(newPeople);
+        console.log("AppContext: Updated people state with new user:", newPeople);
       } else {
         console.warn(
           "Validation failed for new user data returned by Supabase. User not added to local state.",
@@ -214,15 +211,13 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
         );
         setError("Failed to process new user data from database. Please try refreshing.");
       }
-    } else if (!error) { // No Supabase error from insert, but newInsertedUsers is null or empty
+    } else {
       console.warn(
         "User insert succeeded according to Supabase, but no user data was returned. Check RLS policies or .select() statement.",
         "newInsertedUsers:", newInsertedUsers
       );
-      // Optionally set an error for the user, or just log for developer awareness.
-      // setError("New user added, but couldn't immediately display. Please try refreshing."); // Example error for UI
+      setError("New user added, but couldn't immediately display. Please try refreshing.");
     }
-    // The 'error' variable from the insert operation is already handled before this block.
   };
 
   // Pay coffee

@@ -12,6 +12,7 @@ export interface DBUser {
   name: string;
   email: string;
   avatar_url: string;
+  department: string;
   created_at: string;
 }
 
@@ -29,4 +30,5 @@ export interface UserFormData {
   name: string;
   email: string;
   avatar_url: string;
+  department: string;
 }
