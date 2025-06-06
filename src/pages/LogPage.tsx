@@ -4,29 +4,37 @@ import Header from '../components/Header';
 import { Calendar, Clock } from 'lucide-react';
 
 const LogPage: React.FC = () => {
-  const { people, addCoffeeRecord, setCurrentView } = useAppContext();
-  const [selectedPersonId, setSelectedPersonId] = useState<string>('');
+  const { people, addCoffeeRecord, setCurrentView, selectUser } = useAppContext();
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState<string>(
     new Date().toTimeString().split(' ')[0].substring(0, 5)
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedPersonId) {
+    if (!selectedUserId) {
       alert('Please select a person');
       return;
     }
     
-    const dateTime = new Date(`${date}T${time}`);
-    
-    addCoffeeRecord(selectedPersonId, dateTime);
-    setCurrentView('home');
+    try {
+      await addCoffeeRecord(selectedUserId);
+      setCurrentView('home');
+    } catch (error) {
+      console.error('Error adding coffee record:', error);
+      alert('Failed to add coffee record. Please try again.');
+    }
   };
   
   const handleBackClick = () => {
     setCurrentView('home');
+  };
+
+  const handlePersonSelect = (userId: string) => {
+    setSelectedUserId(userId);
+    selectUser(userId);
   };
   
   return (
@@ -45,8 +53,8 @@ const LogPage: React.FC = () => {
             </label>
             <div className="relative">
               <select
-                value={selectedPersonId}
-                onChange={(e) => setSelectedPersonId(e.target.value)}
+                value={selectedUserId}
+                onChange={(e) => handlePersonSelect(e.target.value)}
                 className="block w-full p-3 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 required
               >

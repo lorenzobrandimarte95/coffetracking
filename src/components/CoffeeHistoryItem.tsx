@@ -1,23 +1,40 @@
 import React from 'react';
-import { formatDateTime } from '../utils/helpers';
 import { Coffee } from 'lucide-react';
 
 interface CoffeeHistoryItemProps {
   date: Date;
-  paid?: boolean;
+  paid: boolean;
+  onPayClick?: () => void;
 }
 
-const CoffeeHistoryItem: React.FC<CoffeeHistoryItemProps> = ({ date, paid }) => {
+const CoffeeHistoryItem: React.FC<CoffeeHistoryItemProps> = ({ date, paid, onPayClick }) => {
+  const formattedDate = new Intl.DateTimeFormat('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  }).format(date);
+
   return (
-    <div className="py-3 border-b border-gray-100 flex items-center">
-      <div className={`w-2 h-2 rounded-full mr-3 ${paid ? 'bg-green-500' : 'bg-orange-500'}`} />
-      <div className="flex flex-1 items-center justify-between">
+    <div className="py-4 flex items-center justify-between">
+      <div className="flex items-center">
+        <Coffee size={20} className={`mr-3 ${paid ? 'text-green-500' : 'text-orange-500'}`} />
         <div>
-          <div className="font-medium text-gray-800">Coffee</div>
-          <div className="text-sm text-gray-500">{formatDateTime(date)}</div>
+          <div className="text-gray-900">{formattedDate}</div>
+          <div className={`text-sm ${paid ? 'text-green-500' : 'text-orange-500'}`}>
+            {paid ? 'Paid' : 'Unpaid'}
+          </div>
         </div>
-        <Coffee size={20} className="text-gray-400" />
       </div>
+      {!paid && onPayClick && (
+        <button
+          onClick={onPayClick}
+          className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+        >
+          Pay
+        </button>
+      )}
     </div>
   );
 };

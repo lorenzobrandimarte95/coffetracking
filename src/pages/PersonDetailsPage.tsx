@@ -8,19 +8,19 @@ const PersonDetailsPage: React.FC = () => {
   const { 
     people, 
     coffeeRecords, 
-    selectedPersonId, 
-    selectPerson, 
+    selectedUserId, 
+    selectUser, 
     setCurrentView,
     payCoffee
   } = useAppContext();
   
   // If no person is selected, redirect to home
-  if (!selectedPersonId) {
+  if (!selectedUserId) {
     setCurrentView('home');
     return null;
   }
   
-  const person = people.find(p => p.id === selectedPersonId);
+  const person = people.find(p => p.id === selectedUserId);
   
   if (!person) {
     setCurrentView('home');
@@ -28,72 +28,61 @@ const PersonDetailsPage: React.FC = () => {
   }
   
   const personRecords = coffeeRecords
-    .filter(record => record.personId === selectedPersonId)
+    .filter(record => record.user_id === selectedUserId)
     .sort((a, b) => b.date.getTime() - a.date.getTime());
   
   const handleBackClick = () => {
-    selectPerson(null);
+    selectUser(null);
     setCurrentView('home');
   };
   
-  const handlePayClick = () => {
-    if (person.coffeesOwed > 0) {
-      payCoffee(selectedPersonId, 1);
+  const handlePayClick = async (recordId: string) => {
+    try {
+      await payCoffee(recordId);
+    } catch (error) {
+      console.error('Error paying coffee:', error);
+      alert('Failed to mark coffee as paid. Please try again.');
     }
   };
   
   return (
     <div className="pb-16 min-h-screen bg-gray-50">
       <Header 
-        title="Coffee History" 
+        title={person.name} 
         showBack={true}
         onBackClick={handleBackClick}
       />
       
-      <main className="max-w-md mx-auto">
-        <div className="bg-white p-6 mb-6 flex flex-col items-center">
-          <div className="relative mb-2">
-            <img 
-              src={person.avatar} 
-              alt={person.name} 
-              className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-sm" 
-            />
-            <div 
-              className="absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-sm text-white font-bold"
-              style={{ 
-                backgroundColor: person.color,
-                boxShadow: '0 0 0 2px white'
-              }}
-            >
-              {person.coffeesOwed}
+      <main className="max-w-md mx-auto p-4">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-5">
+          <div className="p-4 border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Outstanding Coffees</h3>
+                <p className="text-sm text-gray-500">Total: {person.coffeesOwed}</p>
+              </div>
+              {person.coffeesOwed > 0 && (
+                <button
+                  onClick={() => handlePayClick(personRecords[0]?.id)}
+                  className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  Pay One
+                </button>
+              )}
             </div>
           </div>
-          
-          <h2 className="text-2xl font-bold text-gray-900 mt-2">{person.name}</h2>
-          <p className="text-gray-600 flex items-center mt-1">
-            <span>Coffees to pay:</span>
-            <span className="ml-2 font-bold text-orange-500">{person.coffeesOwed}</span>
-          </p>
-          
-          {person.coffeesOwed > 0 && (
-            <button 
-              className="mt-4 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-              onClick={handlePayClick}
-            >
-              Mark One as Paid
-            </button>
-          )}
         </div>
         
         <div className="bg-white rounded-t-xl p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Coffee Details</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">Coffee History</h3>
           
           <div className="divide-y divide-gray-100">
             {personRecords.map(record => (
               <CoffeeHistoryItem 
                 key={record.id} 
                 date={record.date} 
-                paid={record.paid} 
+                paid={record.paid}
+                onPayClick={() => handlePayClick(record.id)}
               />
             ))}
             
