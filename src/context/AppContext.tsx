@@ -89,9 +89,9 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
 
   // Transform users and coffeeRecords to people
   useEffect(() => {
-    if (!users.length) { // If no users, no people to create or users fetch failed
-        setPeople([]);
-        return;
+    if (!users.length) {
+      setPeople([]);
+      return;
     }
 
     const newPeople = users.map(user => {
@@ -101,14 +101,13 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
       return {
         id: user.id,
         name: user.name,
-        avatar: user.avatar_url, // Map avatar_url to avatar
         coffeesOwed: coffeesOwed,
-        color: '#CCCCCC', // Default color
+        color: '#CCCCCC',
         email: user.email,
-      } as Person; // Type assertion if necessary for stricter type checking
+      } as Person;
     });
     setPeople(newPeople);
-  }, [users, coffeeRecords]); // Re-run when users or coffeeRecords change
+  }, [users, coffeeRecords]);
 
   // Add a new coffee record
   const addCoffeeRecord = async (userId: string) => {
@@ -155,68 +154,45 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
       return;
     }
 
-    // Chain .select() to get the inserted record back
-    const { data: newInsertedUsers, error } = await supabase
+    const { data: newUser, error: insertError } = await supabase
       .from('users')
       .insert([userData])
-      .select();
+      .select('*')
+      .single();
 
-    if (error) {
-      setError(error.message);
+    if (insertError) {
+      console.error('Error inserting user:', insertError);
+      setError(insertError.message);
       return;
     }
 
-    // Stricter validation for the returned user data
-    if (newInsertedUsers && newInsertedUsers.length > 0) {
-      const potentialNewUser = newInsertedUsers[0];
+    if (!newUser) {
+      setError("Failed to create user. No data returned.");
+      return;
+    }
 
-      // Validate essential fields
-      if (
-        potentialNewUser &&
-        typeof potentialNewUser.id === 'string' && potentialNewUser.id.trim() !== '' &&
-        typeof potentialNewUser.name === 'string' && potentialNewUser.name.trim() !== '' &&
-        typeof potentialNewUser.avatar_url === 'string' && // Allows empty string for avatar_url
-        typeof potentialNewUser.email === 'string' && // Basic check, could be stricter regex
-        typeof potentialNewUser.created_at === 'string' // Basic check, could be Date validation
-      ) {
-        const validatedNewUser: DBUser = {
-          id: potentialNewUser.id,
-          name: potentialNewUser.name,
-          email: potentialNewUser.email,
-          avatar_url: potentialNewUser.avatar_url,
-          created_at: potentialNewUser.created_at,
-        };
-        setUsers(currentUsers => [...currentUsers, validatedNewUser]);
+    // Validate the returned user data
+    if (
+      typeof newUser.id === 'string' && newUser.id.trim() !== '' &&
+      typeof newUser.name === 'string' && newUser.name.trim() !== '' &&
+      typeof newUser.email === 'string' &&
+      typeof newUser.created_at === 'string'
+    ) {
+      // Add the new user to the local state
+      setUsers(currentUsers => [...currentUsers, newUser]);
 
-        // Update people state with the new user
-        const nextUsersState = [...users, validatedNewUser];
-        const newPeople = nextUsersState.map(usr => {
-          const userCoffeeRecords = (coffeeRecords || []).filter(record => record.user_id === usr.id && !record.paid);
-          const coffeesOwed = userCoffeeRecords.length;
-          return {
-            id: usr.id,
-            name: usr.name,
-            avatar: usr.avatar_url,
-            coffeesOwed: coffeesOwed,
-            color: '#CCCCCC', // Default color
-            email: usr.email,
-          } as Person;
-        });
-        setPeople(newPeople);
-        console.log("AppContext: Updated people state with new user:", newPeople);
-      } else {
-        console.warn(
-          "Validation failed for new user data returned by Supabase. User not added to local state.",
-          "Received data:", potentialNewUser
-        );
-        setError("Failed to process new user data from database. Please try refreshing.");
-      }
+      // Update people state with the new user
+      const newPerson: Person = {
+        id: newUser.id,
+        name: newUser.name,
+        coffeesOwed: 0,
+        color: '#CCCCCC',
+        email: newUser.email,
+      };
+      setPeople(currentPeople => [...currentPeople, newPerson]);
     } else {
-      console.warn(
-        "User insert succeeded according to Supabase, but no user data was returned. Check RLS policies or .select() statement.",
-        "newInsertedUsers:", newInsertedUsers
-      );
-      setError("New user added, but couldn't immediately display. Please try refreshing.");
+      console.warn("Invalid user data returned from database:", newUser);
+      setError("Failed to process new user data. Please try refreshing.");
     }
   };
 
