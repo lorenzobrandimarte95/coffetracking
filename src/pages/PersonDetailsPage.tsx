@@ -1,3 +1,4 @@
+// src/pages/PersonDetailsPage.tsx (CON CODICE DI DEBUG)
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import Header from '../components/Header';
@@ -14,22 +15,38 @@ const PersonDetailsPage: React.FC = () => {
     payCoffee
   } = useAppContext();
   
-  // If no person is selected, redirect to home
+  // Trova la persona selezionata
+  const person = people.find(p => p.id === selectedUserId);
+  
+  // Filtra i record per questa persona
+  const personRecords = coffeeRecords
+    .filter(record => record.user_id === selectedUserId)
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
+
+  // =================================================================
+  // --- INIZIO BLOCCO DI DEBUG ---
+  console.log("--- DEBUG: Pagina Dettagli Utente ---");
+  console.log("ID Utente Selezionato:", selectedUserId);
+  console.log("Oggetto 'person' trovato:", person);
+  console.log("Tutti i 'people' dal contesto:", people);
+  console.log("Tutti i 'coffeeRecords' dal contesto:", coffeeRecords);
+  console.log("Record filtrati per questa persona:", personRecords);
+  console.log("-----------------------------------------");
+  // --- FINE BLOCCO DI DEBUG ---
+  // =================================================================
+  
+  // Se nessuna persona è selezionata, torna alla home
   if (!selectedUserId) {
     setCurrentView('home');
     return null;
   }
   
-  const person = people.find(p => p.id === selectedUserId);
-  
+  // Se l'oggetto persona non viene trovato nell'array 'people', torna alla home
   if (!person) {
+    console.error("ERRORE: Impossibile trovare la persona con l'ID fornito. Torno alla home.");
     setCurrentView('home');
     return null;
   }
-  
-  const personRecords = coffeeRecords
-    .filter(record => record.user_id === selectedUserId)
-    .sort((a, b) => b.date.getTime() - a.date.getTime());
   
   const handleBackClick = () => {
     selectUser(null);
