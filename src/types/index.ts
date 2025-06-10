@@ -22,7 +22,7 @@ export interface CoffeeRecord {
   created_at: string;
 }
 
-export type AppView = 'home' | 'log' | 'profile';
+export type AppView = 'home' | 'addCoffee' | 'profile';
 
 export interface UserFormData {
   name: string;
