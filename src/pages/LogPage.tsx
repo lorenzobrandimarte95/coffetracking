@@ -1,48 +1,49 @@
-// src/pages/LogPage.tsx
-import React, { useState, useEffect } from 'react'; // Importa useEffect
-import { useAppContext } from '../context/AppContext'; //
-import Header from '../components/Header'; //
-import { Calendar, Clock } from 'lucide-react'; //
+// src/pages/LogPage.tsx (CODICE FINALE E CORRETTO)
+import React, { useState, useEffect } from 'react';
+import { useAppContext } from '../context/AppContext';
+import Header from '../components/Header';
+import { Calendar, Clock } from 'lucide-react';
 
 const LogPage: React.FC = () => {
-  const { people, addCoffeeRecord, setCurrentView, selectedUserId, selectUser } = useAppContext(); // Usa selectedUserId dal contesto
-  const [localSelectedUserId, setLocalSelectedUserId] = useState<string>(selectedUserId || ''); // Nuovo stato locale per il dropdown, inizializzato con selectedUserId del contesto
-  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]); //
-  const [time, setTime] = useState<string>( //
-    new Date().toTimeString().split(' ')[0].substring(0, 5) //
+  const { people, addCoffeeRecord, setCurrentView, selectedUserId, selectUser } = useAppContext();
+  
+  // Stato LOCALE per gestire solo questo form.
+  // Si inizializza con l'utente selezionato globalmente (se arrivi dalla pagina del profilo),
+  // altrimenti è vuoto.
+  const [personIdForForm, setPersonIdForForm] = useState<string>(selectedUserId || '');
+  
+  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [time, setTime] = useState<string>(
+    new Date().toTimeString().split(' ')[0].substring(0, 5)
   );
 
-  // Sincronizza lo stato locale del dropdown con selectedUserId del contesto
+  // Sincronizza lo stato locale se lo stato globale cambia
   useEffect(() => {
-    setLocalSelectedUserId(selectedUserId || '');
-  }, [selectedUserId]); //
+    setPersonIdForForm(selectedUserId || '');
+  }, [selectedUserId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!localSelectedUserId) { // Usa localSelectedUserId
+    if (!personIdForForm) {
       alert('Please select a person');
       return;
     }
     
     try {
-      await addCoffeeRecord(localSelectedUserId); // Usa localSelectedUserId
-      setCurrentView('home'); //
-      selectUser(null); // Deseleziona l'utente dopo l'aggiunta del caffè
+      await addCoffeeRecord(personIdForForm);
+      alert('Caffè aggiunto con successo!');
+      setCurrentView('home');
+      selectUser(null); // Pulisce lo stato globale dopo l'azione
     } catch (error) {
-      console.error('Error adding coffee record:', error); //
-      alert('Failed to add coffee record. Please try again.'); //
+      console.error('Error adding coffee record:', error);
+      alert('Failed to add coffee record. Please try again.');
     }
   };
   
   const handleBackClick = () => {
-    setCurrentView('home'); //
-    selectUser(null); // Assicurati di deselezionare l'utente quando torni indietro
-  };
-
-  const handlePersonSelect = (userId: string) => {
-    setLocalSelectedUserId(userId); // Aggiorna solo lo stato locale del dropdown
-    selectUser(userId); // Questo aggiorna selectedUserId nel contesto, per coerenza
+    setCurrentView('home');
+    selectUser(null); // Pulisce lo stato globale quando si torna indietro
   };
   
   return (
@@ -61,8 +62,9 @@ const LogPage: React.FC = () => {
             </label>
             <div className="relative">
               <select
-                value={localSelectedUserId} // Usa lo stato locale sincronizzato
-                onChange={(e) => handlePersonSelect(e.target.value)}
+                // Usa e aggiorna solo lo stato locale del form
+                value={personIdForForm}
+                onChange={(e) => setPersonIdForForm(e.target.value)}
                 className="block w-full p-3 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 required
               >
