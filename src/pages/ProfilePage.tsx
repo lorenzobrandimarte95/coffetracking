@@ -8,9 +8,6 @@ const ProfilePage: React.FC = () => {
   const { people, coffeeRecords, addUser } = useAppContext();
   const [showAddUserForm, setShowAddUserForm] = useState(false);
   
-  // URL di un'immagine di default
-  const DEFAULT_AVATAR_URL = 'https://www.svgrepo.com/show/508699/user-square.svg';
-
   const totalCoffees = coffeeRecords.length;
   const totalOwed = people.reduce((acc, person) => acc + person.coffeesOwed, 0);
   
@@ -27,7 +24,6 @@ const ProfilePage: React.FC = () => {
       <Header title="Profile" />
       
       <main className="max-w-md mx-auto p-4">
-        {/* ... resto del codice invariato ... */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-5">
           <div className="flex items-center">
             <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center">
@@ -57,8 +53,7 @@ const ProfilePage: React.FC = () => {
             <div className="p-4 border-t border-gray-100 flex items-center justify-between">
               <div className="flex items-center">
                 <img 
-                  // Se topDebtor.avatar non esiste, usa l'URL di default
-                  src={topDebtor.avatar || DEFAULT_AVATAR_URL} 
+                  src={topDebtor.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(topDebtor.name)}&background=random&color=fff`} 
                   alt={topDebtor.name} 
                   className="w-10 h-10 rounded-full object-cover bg-gray-200" 
                 />
@@ -80,7 +75,6 @@ const ProfilePage: React.FC = () => {
           )}
         </div>
         
-        {/* ... resto del codice invariato ... */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <h3 className="text-lg font-semibold p-4 border-b border-gray-100">Settings</h3>
           <div className="divide-y divide-gray-100">
