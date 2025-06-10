@@ -1,3 +1,4 @@
+// src/App.tsx (corretto)
 import React from 'react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import HomePage from './pages/HomePage';
@@ -5,10 +6,11 @@ import LogPage from './pages/LogPage';
 import PersonDetailsPage from './pages/PersonDetailsPage';
 import ProfilePage from './pages/ProfilePage';
 import Navigation from './components/Navigation';
-import { supabaseInitializationError } from './lib/supabase'; // Corrected path
+import { supabaseInitializationError } from './lib/supabase';
 
 const AppContent: React.FC = () => {
-  const { currentView, selectedPersonId } = useAppContext();
+  // --- UNICA MODIFICA QUI ---
+  const { currentView, selectedUserId } = useAppContext(); // Corretto da selectedPersonId a selectedUserId
 
   if (supabaseInitializationError) {
     return (
@@ -32,11 +34,12 @@ const AppContent: React.FC = () => {
     );
   }
 
+  // Questa logica ora funzionerà correttamente con la variabile giusta
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
       {currentView === 'home' && <HomePage />}
       {currentView === 'log' && (
-        selectedPersonId ? <PersonDetailsPage /> : <LogPage />
+        selectedUserId ? <PersonDetailsPage /> : <LogPage />
       )}
       {currentView === 'profile' && <ProfilePage />}
       <Navigation />
