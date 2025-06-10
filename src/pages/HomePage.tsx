@@ -1,20 +1,26 @@
-import React, { useState } from 'react';
+// src/pages/HomePage.tsx
+
+import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import Header from '../components/Header';
 import PersonCard from '../components/PersonCard';
 import { Plus, Coffee } from 'lucide-react';
 
 const HomePage: React.FC = () => {
-  const { people, selectPerson, setCurrentView } = useAppContext();
-  const [showAddModal, setShowAddModal] = useState(false);
-  
+  // MODIFICA: Usiamo 'selectUser' che è il nome corretto esportato dal contesto.
+  const { people, selectUser, setCurrentView } = useAppContext();
+
   const handlePersonClick = (personId: string) => {
-    selectPerson(personId);
+    // MODIFICA: La funzione si chiama 'selectUser'
+    selectUser(personId);
     setCurrentView('log');
   };
   
   const handleAddClick = () => {
-    // Open add coffee modal or navigate to add coffee page
+    // --- QUESTA È LA MODIFICA CHIAVE ---
+    // 1. Resetta l'utente selezionato a null per evitare di andare alla pagina di dettaglio.
+    selectUser(null);
+    // 2. Vai alla pagina di log generica.
     setCurrentView('log');
   };
   
