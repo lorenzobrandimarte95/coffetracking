@@ -8,9 +8,6 @@ interface PersonCardProps {
 }
 
 const PersonCard: React.FC<PersonCardProps> = ({ person, onClick }) => {
-  // URL di un'immagine di default
-  const DEFAULT_AVATAR_URL = 'https://www.svgrepo.com/show/508699/user-square.svg';
-
   const coffeeIndicators = Array.from({ length: person.coffeesOwed }, (_, i) => (
     <div 
       key={i}
@@ -19,6 +16,9 @@ const PersonCard: React.FC<PersonCardProps> = ({ person, onClick }) => {
     />
   ));
   
+  // URL dinamico per generare un avatar con le iniziali del nome
+  const avatarUrl = person.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(person.name)}&background=random&color=fff`;
+
   return (
     <div 
       className="bg-white rounded-xl shadow-sm mb-3 p-4 flex items-center justify-between hover:shadow-md transition-shadow cursor-pointer"
@@ -27,8 +27,7 @@ const PersonCard: React.FC<PersonCardProps> = ({ person, onClick }) => {
       <div className="flex items-center">
         <div className="relative">
           <img 
-            // Se person.avatar non esiste, usa l'URL di default
-            src={person.avatar || DEFAULT_AVATAR_URL} 
+            src={avatarUrl}
             alt={person.name} 
             className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm bg-gray-200" 
           />
