@@ -1,3 +1,4 @@
+// src/components/Header.tsx
 import React from 'react';
 import { Plus, ArrowLeft } from 'lucide-react';
 
@@ -5,7 +6,7 @@ interface HeaderProps {
   title: string;
   showBack?: boolean;
   showAdd?: boolean;
-  showLogo?: boolean; // Nuova prop per mostrare il logo
+  showLogo?: boolean;
   onBackClick?: () => void;
   onAddClick?: () => void;
 }
@@ -14,9 +15,44 @@ const Header: React.FC<HeaderProps> = ({
   title,
   showBack = false,
   showAdd = false,
-  showLogo = false, // Valore di default
+  showLogo = false,
   onBackClick,
   onAddClick
 }) => {
-  // Il tuo logo in formato Base64
-  const logoSrc = "data:image/svg+xml;charset=utf-8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIxLjAuMiwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxpdmVsbG9fMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiCgkgdmlld0JveD0iMCAwIDE4OCAxMDYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDE4OCAxMDY7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KCS5zdDB7ZmlsbDojMzEzMTMwO30KPC9zdHlsZT4KPGc+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTMzLjgsNzBjLTYuOSw2LjctMTUuNCwxMC4xLTI1LjYsMTAuMVM4OS41LDc2LjgsODIuNiw3MGMtNi45LTYuNy0xMC4zLTE1LjEtMTAuMy0yNS4yczMuNC0xOC40LDEwLjMtMjUuMgoJCWM2LjktNi43LDE1LjQtMTAuMSwyNS42LTEwLjFzMTguNywzLjQsMjUuNiwxMC4xYzYuOSw2LjcsMTAuMywxNS4xLDEwLjMsMjUuMlMxNDAuNyw2My4zLDEzMy44LDcweiBNMTI1LjMsMjcuMwoJCWMtNC43LTQuOC0xMC40LTcuMi0xNy4xLTcuMmMtNi44LDAtMTIuNSwyLjQtMTcuMSw3LjJjLTQuNyw0LjgtNywxMC43LTcsMTcuNWMwLDYuOSwyLjMsMTIuNyw3LDE3LjVjNC43LDQuOCwxMC40LDcuMiwxNy4xLDcuMgoJCWM2LjgsMCwxMi41LTIuNCwxNy4xLTcuMmM0LjctNC44LDctMTAuNyw3LTE3LjVDMTMyLjMsMzgsMTMwLDMyLjEsMTI1LjMsMjcuM3oiLz4KCTxnPgoJCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik01NCw2N2MtMi45LDEuMy02LjMsMi0xMC4yLDJjLTYuNCwwLTExLjktMi4zLTE2LjUtN2MtNC43LTQuNy03LTEwLjQtNy0xNy40YzAtNi45LDIuMy0xMi42LDctMTcuMQoJCQljNC43LTQuNSwxMC41LTYuNywxNy40LTYuN2MzLjksMCw3LjMsMC42LDEwLjIsMS45YzIuNSwxLjEsNS4xLDIuOSw3LjksNS4zYzEuNi0zLDMuNy01LjksNi40LTguNGMwLjEtMC4xLDAuMi0wLjIsMC40LTAuMwoJCQljLTYuNy02LjUtMTQuOS05LjgtMjQuNi05LjhjLTEwLjYsMC0xOS4zLDMuNC0yNi4zLDEwLjJDMTEuNywyNi41LDguMiwzNC45LDguMiw0NS4xczMuNCwxOC41LDEwLjIsMjUuMnMxNS40LDEwLDI1LjcsMTAKCQkJYzkuNiwwLDE3LjgtMy41LDI0LjgtMTAuNGMtMi43LTIuNi00LjgtNS42LTYuNC04LjdDNTkuNSw2My44LDU2LjcsNjUuOCw1NCw2N3oiLz4KCTwvZz4KCTxnPgoJCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNTkuMSw5LjZoN3YxNy4yaC0zLjdWMTIuOWgtMy4zVjkuNnoiLz4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTcyLjUsOS42aDd2MTcuMmgtMy43VjEyLjloLTMuM1Y5LjZ6Ii8+Cgk8L2c+Cgk8cmVjdCB4PSIxNTYuNiIgeT0iMzMuMiIgY2xhc3M9InN0MCIgd2lkdGg9IjI1LjQiIGhlaWdodD0iMy43Ii8+Cgk8Zz4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTIuMSw5Mi4yYzEuMywwLDIuNCwwLjQsMy4yLDEuMmwtMC43LDAuOWMtMC43LTAuNi0xLjUtMS0yLjUtMWMtMC45LDAtMS42LDAuMy0yLjEsMC44CgkJCWMtMC42LDAuNi0wLjgsMS4zLTAuOCwyLjJjMCwwLjksMC4zLDEuNiwwLjgsMi4yYzAuNiwwLjYsMS4zLDAuOSwyLjEsMC45YzEuMSwwLDItMC40LDIuNi0xLjFsMC43LDAuOGMtMC44LDEtMS45LDEuNC0zLjMsMS40CgkJCWMtMS4yLDAtMi4yLTAuNC0zLTEuMmMtMC44LTAuOC0xLjEtMS44LTEuMS0zYzAtMS4yLDAuNC0yLjIsMS4yLTNDOS45LDkyLjYsMTAuOSw5Mi4yLDEyLjEsOTIuMnoiLz4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTcuNiw5My4zYzAuOC0wLjgsMS44LTEuMiwzLTEuMmMxLjIsMCwyLjIsMC40LDMsMS4yczEuMiwxLjgsMS4yLDNjMCwxLjItMC40LDIuMi0xLjIsM3MtMS44LDEuMi0zLDEuMgoJCQljLTEuMiwwLTIuMi0wLjQtMy0xLjJjLTAuOC0wLjgtMS4yLTEuOC0xLjItM0MxNi40LDk1LjEsMTYuOCw5NC4xLDE3LjYsOTMuM3ogTTIyLjgsOTQuMmMtMC42LTAuNi0xLjMtMC45LTIuMS0wLjkKCQkJYy0wLjksMC0xLjYsMC4zLTIuMSwwLjljLTAuNiwwLjYtMC44LDEuMy0wLjgsMi4yYzAsMC45LDAuMywxLjcsMC44LDIuMmMwLjYsMC42LDEuMywwLjksMi4xLDAuOWMwLjksMCwxLjYtMC4zLDIuMS0wLjkKCQkJYzAuNi0wLjYsMC44LTEuMywwLjgtMi4yQzIzLjYsOTUuNSwyMy4zLDk0LjcsMjIuOCw5NC4yeiIvPgoJCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0zMS40LDkyLjJjMSwwLDEuOCwwLjMsMi4zLDAuOWMwLjYsMC42LDAuOCwxLjQsMC44LDIuNHY1LjFoLTEuMnYtNC44YzAtMC43LTAuMi0xLjMtMC42LTEuNwoJCQljLTAuNC0wLjQtMS0wLjYtMS43LTAuNmMtMC44LDAtMS41LDAuMy0xLjksMC43cy0wLjgsMS4xLTAuOCwxLjl2NC41SDI3di04LjNoMS4yVjk0QzI4LjgsOTIuOCwyOS44LDkyLjIsMzEuNCw5Mi4yeiIvPgoJCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik00MS4yLDk4LjlsMC4zLDFjLTAuNiwwLjQtMS4yLDAuNi0xLjksMC42Yy0wLjYsMC0xLjItMC4yLTEuNS0wLjZjLTAuNC0wLjQtMC42LTEtMC42LTEuOHYtNC43aC0xLjJ2LTFoMS4yCgkJCXYtMi4yaDEuMnYyLjJsMi42LDB2MWgtMi42Vjk4YzAsMC45LDAuNCwxLjQsMS4xLDEuNEM0MC4zLDk5LjQsNDAuOCw5OS4yLDQxLjIsOTguOXoiLz4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNDYuNiw5Mi4yYzEuMywwLDIuMywwLj
+  // Questo percorso ora funzionerà perché il file si trova in /public/logo.svg
+  const logoSrc = "/logo.svg"; 
+
+  return (
+    <header className="sticky top-0 bg-white shadow-sm z-10">
+      <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center h-8">
+          {showBack && (
+            <button 
+              onClick={onBackClick}
+              className="mr-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <ArrowLeft size={24} className="text-gray-700" />
+            </button>
+          )}
+          
+          {showLogo ? (
+            <img src={logoSrc} alt="Coffee Tracker Logo" className="h-full" />
+          ) : (
+            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+          )}
+        </div>
+        
+        {showAdd && (
+          <button 
+            onClick={onAddClick}
+            className="p-2 rounded-full bg-white text-orange-500 border border-orange-500 hover:bg-orange-50 transition-colors"
+          >
+            <Plus size={20} />
+          </button>
+        )}
+      </div>
+    </header>
+  );
+};
+
+export default Header;
