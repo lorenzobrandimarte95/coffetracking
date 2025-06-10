@@ -27,7 +27,7 @@ const HomePage: React.FC = () => {
       />
       
       <main className="max-w-md mx-auto p-4">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Outstanding Coffees</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Coffees</h2>
         
         <div>
           {people
