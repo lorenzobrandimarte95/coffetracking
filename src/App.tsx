@@ -1,4 +1,3 @@
-// src/App.tsx (CODICE CORRETTO E DEFINITIVO)
 import React from 'react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import HomePage from './pages/HomePage';
@@ -9,8 +8,6 @@ import Navigation from './components/Navigation';
 import { supabaseInitializationError } from './lib/supabase';
 
 const AppContent: React.FC = () => {
-  // --- QUESTA È LA CORREZIONE FONDAMENTALE ---
-  // La variabile si chiama "selectedUserId", non "selectedPersonId".
   const { currentView, selectedUserId } = useAppContext();
 
   if (supabaseInitializationError) {
@@ -35,11 +32,11 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // Con la variabile corretta, questa logica funzionerà.
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
       {currentView === 'home' && <HomePage />}
-      {currentView === 'log' && (
+      {/* MODIFICA: Controlliamo 'addCoffee' (o il nome che hai scelto) invece di 'log' */}
+      {currentView === 'addCoffee' && (
         selectedUserId ? <PersonDetailsPage /> : <LogPage />
       )}
       {currentView === 'profile' && <ProfilePage />}
