@@ -1,4 +1,3 @@
-// src/pages/HomePage.tsx (CODICE CORRETTO)
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import Header from '../components/Header';
@@ -10,14 +9,12 @@ const HomePage: React.FC = () => {
 
   const handlePersonClick = (personId: string) => {
     selectUser(personId);
-    setCurrentView('log');
+    setCurrentView('addCoffee');
   };
   
   const handleAddClick = () => {
-    // Resetta l'utente selezionato
     selectUser(null);
-    // E poi naviga
-    setCurrentView('log');
+    setCurrentView('addCoffee');
   };
   
   return (
@@ -26,6 +23,7 @@ const HomePage: React.FC = () => {
         title="Coffee Tracker" 
         showAdd={true}
         onAddClick={handleAddClick}
+        showLogo={true} // Aggiunta questa riga
       />
       
       <main className="max-w-md mx-auto p-4">
