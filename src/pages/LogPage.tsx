@@ -1,40 +1,48 @@
-import React, { useState } from 'react';
-import { useAppContext } from '../context/AppContext';
-import Header from '../components/Header';
-import { Calendar, Clock } from 'lucide-react';
+// src/pages/LogPage.tsx
+import React, { useState, useEffect } from 'react'; // Importa useEffect
+import { useAppContext } from '../context/AppContext'; //
+import Header from '../components/Header'; //
+import { Calendar, Clock } from 'lucide-react'; //
 
 const LogPage: React.FC = () => {
-  const { people, addCoffeeRecord, setCurrentView, selectUser } = useAppContext();
-  const [selectedUserId, setSelectedUserId] = useState<string>('');
-  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [time, setTime] = useState<string>(
-    new Date().toTimeString().split(' ')[0].substring(0, 5)
+  const { people, addCoffeeRecord, setCurrentView, selectedUserId, selectUser } = useAppContext(); // Usa selectedUserId dal contesto
+  const [localSelectedUserId, setLocalSelectedUserId] = useState<string>(selectedUserId || ''); // Nuovo stato locale per il dropdown, inizializzato con selectedUserId del contesto
+  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]); //
+  const [time, setTime] = useState<string>( //
+    new Date().toTimeString().split(' ')[0].substring(0, 5) //
   );
+
+  // Sincronizza lo stato locale del dropdown con selectedUserId del contesto
+  useEffect(() => {
+    setLocalSelectedUserId(selectedUserId || '');
+  }, [selectedUserId]); //
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedUserId) {
+    if (!localSelectedUserId) { // Usa localSelectedUserId
       alert('Please select a person');
       return;
     }
     
     try {
-      await addCoffeeRecord(selectedUserId);
-      setCurrentView('home');
+      await addCoffeeRecord(localSelectedUserId); // Usa localSelectedUserId
+      setCurrentView('home'); //
+      selectUser(null); // Deseleziona l'utente dopo l'aggiunta del caffè
     } catch (error) {
-      console.error('Error adding coffee record:', error);
-      alert('Failed to add coffee record. Please try again.');
+      console.error('Error adding coffee record:', error); //
+      alert('Failed to add coffee record. Please try again.'); //
     }
   };
   
   const handleBackClick = () => {
-    setCurrentView('home');
+    setCurrentView('home'); //
+    selectUser(null); // Assicurati di deselezionare l'utente quando torni indietro
   };
 
   const handlePersonSelect = (userId: string) => {
-    setSelectedUserId(userId);
-    selectUser(userId);
+    setLocalSelectedUserId(userId); // Aggiorna solo lo stato locale del dropdown
+    selectUser(userId); // Questo aggiorna selectedUserId nel contesto, per coerenza
   };
   
   return (
@@ -53,7 +61,7 @@ const LogPage: React.FC = () => {
             </label>
             <div className="relative">
               <select
-                value={selectedUserId}
+                value={localSelectedUserId} // Usa lo stato locale sincronizzato
                 onChange={(e) => handlePersonSelect(e.target.value)}
                 className="block w-full p-3 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 required
