@@ -8,7 +8,9 @@ interface PersonCardProps {
 }
 
 const PersonCard: React.FC<PersonCardProps> = ({ person, onClick }) => {
-  // Generate coffee indicators based on count
+  // URL di un'immagine di default
+  const DEFAULT_AVATAR_URL = 'https://www.svgrepo.com/show/508699/user-square.svg';
+
   const coffeeIndicators = Array.from({ length: person.coffeesOwed }, (_, i) => (
     <div 
       key={i}
@@ -25,9 +27,10 @@ const PersonCard: React.FC<PersonCardProps> = ({ person, onClick }) => {
       <div className="flex items-center">
         <div className="relative">
           <img 
-            src={person.avatar} 
+            // Se person.avatar non esiste, usa l'URL di default
+            src={person.avatar || DEFAULT_AVATAR_URL} 
             alt={person.name} 
-            className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm" 
+            className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm bg-gray-200" 
           />
           <div 
             className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs text-white"
