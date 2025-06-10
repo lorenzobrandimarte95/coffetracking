@@ -112,22 +112,36 @@ export const AppProvider: React.FC<{children: ReactNode}> = ({ children }) => {
      setIsLoading(false);
   }
 
-  const addCoffeeRecord = async (userId: string) => {
-    if (!supabase) {
-      setError("Database client not available.");
-      return;
-    }
-    const { error } = await supabase
-      .from('coffee_records')
-      .insert([{ user_id: userId, date: new Date().toISOString(), paid: false }]);
+// Inserisci questo codice in src/context/AppContext.tsx, sostituendo la vecchia funzione addCoffeeRecord
 
-    if (error) {
-      setError(error.message);
-    } else {
-      // Ricarica i dati per riflettere il nuovo caffè
-      await refreshData();
-    }
-  };
+const addCoffeeRecord = async (userId: string) => {
+  if (!supabase) {
+    alert("Errore: Client Supabase non disponibile.");
+    return;
+  }
+
+  console.log(`Tentativo di inserire un caffè per l'utente: ${userId}`);
+
+  const { data, error } = await supabase
+    .from('coffee_records')
+    .insert([{
+      user_id: userId,
+      date: new Date().toISOString(),
+      paid: false
+    }])
+    .select(); // Aggiungiamo .select() per avere un riscontro
+
+  // Se c'è un errore, lo mostriamo in console e in un alert
+  if (error) {
+    console.error("--- ERRORE SPECIFICO NELL'INSERIMENTO DEL CAFFÈ ---", error);
+    alert(`Errore da Supabase: ${error.message}`);
+    setError(error.message);
+    return;
+  }
+
+  console.log("Caffè inserito con successo:", data);
+  await refreshData(); // Usiamo la funzione di refresh esistente
+};
   
   const addUser = async (userData: Omit<DBUser, 'id' | 'created_at'>) => {
     if (!supabase) {
