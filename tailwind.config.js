@@ -6,8 +6,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // Aggiungiamo 'Inter' come font di base
-        sans: ['Inter', ...defaultTheme.fontFamily.sans],
+        // MODIFICA: Sostituiamo 'Inter' con 'DM Sans'
+        sans: ['"DM Sans"', ...defaultTheme.fontFamily.sans],
       },
     },
   },
