@@ -8,7 +8,8 @@ const Navigation: React.FC = () => {
   
   const navItems: {view: AppView, icon: React.ReactNode, label: string}[] = [
     { view: 'home', icon: <Home size={24} />, label: 'Home' },
-    { view: 'log', icon: <Coffee size={24} />, label: 'Log' },
+    // --- UNICA MODIFICA QUI ---
+    { view: 'log', icon: <Coffee size={24} />, label: 'Add Coffee' },
     { view: 'profile', icon: <User size={24} />, label: 'Profile' }
   ];
   
@@ -19,7 +20,6 @@ const Navigation: React.FC = () => {
           {navItems.map(item => (
             <button
               key={item.view}
-              // Stile migliorato per l'elemento attivo
               className={`flex flex-col items-center justify-center w-full h-full transition-colors duration-200 ${
                 currentView === item.view
                   ? 'text-orange-500'
