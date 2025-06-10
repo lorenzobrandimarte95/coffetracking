@@ -1,20 +1,19 @@
-import React, { useState } from 'react'; // Added useState
+import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import Header from '../components/Header';
-import AddUserForm from '../components/AddUserForm'; // Corrected import path
-import { User, Coffee, Clock, Info, ChevronRight } from 'lucide-react'; // ChevronRight might be unused after change
+import AddUserForm from '../components/AddUserForm';
+import { User, Coffee, Clock, Info, ChevronRight } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
-  const { people, coffeeRecords, addUser } = useAppContext(); // Added addUser
-  const [showAddUserForm, setShowAddUserForm] = useState(false); // Added state for form visibility
+  const { people, coffeeRecords, addUser } = useAppContext();
+  const [showAddUserForm, setShowAddUserForm] = useState(false);
   
-  // Calculate total coffees
+  // URL di un'immagine di default
+  const DEFAULT_AVATAR_URL = 'https://www.svgrepo.com/show/508699/user-square.svg';
+
   const totalCoffees = coffeeRecords.length;
-  
-  // Calculate total owed
   const totalOwed = people.reduce((acc, person) => acc + person.coffeesOwed, 0);
   
-  // Person who owes the most
   const topDebtor = [...people]
     .sort((a, b) => b.coffeesOwed - a.coffeesOwed)
     .filter(person => person.coffeesOwed > 0)[0];
@@ -28,6 +27,7 @@ const ProfilePage: React.FC = () => {
       <Header title="Profile" />
       
       <main className="max-w-md mx-auto p-4">
+        {/* ... resto del codice invariato ... */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-5">
           <div className="flex items-center">
             <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center">
@@ -42,7 +42,6 @@ const ProfilePage: React.FC = () => {
         
         <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-5">
           <h3 className="text-lg font-semibold p-4 border-b border-gray-100">Statistics</h3>
-          
           <div className="grid grid-cols-2 divide-x divide-gray-100">
             <div className="p-4 text-center">
               <div className="text-3xl font-bold text-orange-500">{totalCoffees}</div>
@@ -58,9 +57,10 @@ const ProfilePage: React.FC = () => {
             <div className="p-4 border-t border-gray-100 flex items-center justify-between">
               <div className="flex items-center">
                 <img 
-                  src={topDebtor.avatar} 
+                  // Se topDebtor.avatar non esiste, usa l'URL di default
+                  src={topDebtor.avatar || DEFAULT_AVATAR_URL} 
                   alt={topDebtor.name} 
-                  className="w-10 h-10 rounded-full object-cover" 
+                  className="w-10 h-10 rounded-full object-cover bg-gray-200" 
                 />
                 <div className="ml-3">
                   <div className="font-medium">{topDebtor.name}</div>
@@ -80,21 +80,19 @@ const ProfilePage: React.FC = () => {
           )}
         </div>
         
+        {/* ... resto del codice invariato ... */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <h3 className="text-lg font-semibold p-4 border-b border-gray-100">Settings</h3>
-          
           <div className="divide-y divide-gray-100">
             <button
               className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
-              onClick={handleManagePeopleClick} // Changed to use defined handler
+              onClick={handleManagePeopleClick}
             >
               <div className="flex items-center">
                 <Coffee size={20} className="text-gray-400" />
                 <span className="ml-3">Manage People</span>
               </div>
-              {/* <ChevronRight size={18} className="text-gray-400" /> Removed ChevronRight */}
             </button>
-            
             <button className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors">
               <div className="flex items-center">
                 <Clock size={20} className="text-gray-400" />
@@ -102,7 +100,6 @@ const ProfilePage: React.FC = () => {
               </div>
               <ChevronRight size={18} className="text-gray-400" />
             </button>
-            
             <button className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors">
               <div className="flex items-center">
                 <Info size={20} className="text-gray-400" />
