@@ -8,7 +8,7 @@ const Navigation: React.FC = () => {
   
   const navItems: {view: AppView, icon: React.ReactNode, label: string}[] = [
     { view: 'home', icon: <Home size={24} />, label: 'Home' },
-    { view: 'log', icon: <Coffee size={24} />, label: 'Log' },
+    { view: 'log', icon: <Coffee size={24} />, label: 'Add Coffee' },
     { view: 'profile', icon: <User size={24} />, label: 'Profile' }
   ];
   
