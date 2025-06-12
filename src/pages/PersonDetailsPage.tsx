@@ -1,9 +1,8 @@
-// src/pages/PersonDetailsPage.tsx (CON CODICE DI DEBUG)
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import Header from '../components/Header';
 import CoffeeHistoryItem from '../components/CoffeeHistoryItem';
-import { Coffee } from 'lucide-react';
+import { Coffee, Plus } from 'lucide-react'; // Aggiungiamo l'icona Plus
 
 const PersonDetailsPage: React.FC = () => {
   const { 
@@ -12,41 +11,25 @@ const PersonDetailsPage: React.FC = () => {
     selectedUserId, 
     selectUser, 
     setCurrentView,
-    payCoffee
+    payCoffee,
+    addCoffeeRecord // Aggiungiamo la funzione per aggiungere caffè
   } = useAppContext();
   
-  // Trova la persona selezionata
-  const person = people.find(p => p.id === selectedUserId);
-  
-  // Filtra i record per questa persona
-  const personRecords = coffeeRecords
-    .filter(record => record.user_id === selectedUserId)
-    .sort((a, b) => b.date.getTime() - a.date.getTime());
-
-  // =================================================================
-  // --- INIZIO BLOCCO DI DEBUG ---
-  console.log("--- DEBUG: Pagina Dettagli Utente ---");
-  console.log("ID Utente Selezionato:", selectedUserId);
-  console.log("Oggetto 'person' trovato:", person);
-  console.log("Tutti i 'people' dal contesto:", people);
-  console.log("Tutti i 'coffeeRecords' dal contesto:", coffeeRecords);
-  console.log("Record filtrati per questa persona:", personRecords);
-  console.log("-----------------------------------------");
-  // --- FINE BLOCCO DI DEBUG ---
-  // =================================================================
-  
-  // Se nessuna persona è selezionata, torna alla home
   if (!selectedUserId) {
     setCurrentView('home');
     return null;
   }
   
-  // Se l'oggetto persona non viene trovato nell'array 'people', torna alla home
+  const person = people.find(p => p.id === selectedUserId);
+  
   if (!person) {
-    console.error("ERRORE: Impossibile trovare la persona con l'ID fornito. Torno alla home.");
     setCurrentView('home');
     return null;
   }
+  
+  const personRecords = coffeeRecords
+    .filter(record => record.user_id === selectedUserId)
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
   
   const handleBackClick = () => {
     selectUser(null);
@@ -59,6 +42,14 @@ const PersonDetailsPage: React.FC = () => {
     } catch (error) {
       console.error('Error paying coffee:', error);
       alert('Failed to mark coffee as paid. Please try again.');
+    }
+  };
+
+  // Nuova funzione per gestire il click sul pulsante "Add Coffee"
+  const handleAddCoffeeClick = async () => {
+    if (selectedUserId) {
+      await addCoffeeRecord(selectedUserId);
+      // L'alert di successo è già nella funzione addCoffeeRecord nel contesto
     }
   };
   
@@ -78,14 +69,16 @@ const PersonDetailsPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Outstanding Coffees</h3>
                 <p className="text-sm text-gray-500">Total: {person.coffeesOwed}</p>
               </div>
-              {person.coffeesOwed > 0 && (
-                <button
-                  onClick={() => handlePayClick(personRecords[0]?.id)}
-                  className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                >
-                  Pay One
-                </button>
-              )}
+              
+              {/* --- BOTTONE MODIFICATO --- */}
+              <button
+                onClick={handleAddCoffeeClick}
+                className="flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+              >
+                <Plus size={18} className="mr-2" />
+                Add Coffee
+              </button>
+              
             </div>
           </div>
         </div>
